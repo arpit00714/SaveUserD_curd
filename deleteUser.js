@@ -5,10 +5,8 @@ const msg = document.querySelector('.msg');
 const userList = document.querySelector('#users');
 // Listen for form submit
 myForm.addEventListener('submit', onSubmit);
-
 // document.addEventListener('DOMContentLoaded',getData)
 window.onload = getData
-
 function onSubmit(e) {
   e.preventDefault();
   if(nameInput.value === '' || emailInput.value === '') {
@@ -42,21 +40,14 @@ function onSubmit(e) {
     nameInput.value = '';
     emailInput.value = '';
   }
+
 function showUser(user) {
-     userList.innerHTML = userList.innerHTML + `<li id=${user.email}>${user.name}: ${user.email} 
-    <button class="btn delete" onclick=deleteUser('${user.email}')>X</button>
+     userList.innerHTML = userList.innerHTML + `<li id=${user._id}>${user.name}: ${user.email} 
+    <button class="btn delete" onclick=deleteUser('${user._id}')>X</button>
     <button class="btn edit" onclick=editUserDetails('${user.email}','${user.name}')>Edit</button></li> `
     }
 
 function getData() {
-    // let keys = Object.keys(localStorage);
-    // for (let key of keys) {
-    //   let { name, email } = JSON.parse(localStorage.getItem(key))
-    //   userList.innerHTML = userList.innerHTML + `<li id=${email}>${name}: ${email} 
-    //   <button class="btn delete" onclick= deleteUser('${email}')>X</button>
-    //   <button class="btn edit" onclick=editUserDetails('${email}','${name}')>Edit</button></li>`
-    // }
-
   axios.get("https://crudcrud.com/api/0e8214dbe9f34c0c8927660bb2c53826/appointmentData")
   .then(res => {
     res.data.forEach(obj => showUser(obj))
@@ -70,13 +61,20 @@ function getData() {
 
   }
 
-  function deleteUser(emailId) {
-    localStorage.removeItem("userDetails" + emailId)
-    const toDelete = document.getElementById(emailId);
-    userList.removeChild(toDelete)
-  
+  function deleteUser(id) {
+
+    axios.delete(`https://crudcrud.com/api/0e8214dbe9f34c0c8927660bb2c53826/appointment/${id}`)
+    .then(() => {
+      userList.removeChild(document.getElementById(id))
+    })
+    .catch(err => {
+        msg.classList.add('error')
+        msg.innerHTML = err
+        // Remove error after 3 seconds
+        setTimeout(() => msg.remove(), 3000)
+    })
   }
-  
+
   function editUserDetails(emailId, name) {
   
     emailInput.value = emailId;
